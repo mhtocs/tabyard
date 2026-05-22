@@ -1,0 +1,45 @@
+{
+  "name": "tabyard",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "watch": "vue-tsc -b && vite build --watch",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "vitest run lib --passWithNoTests",
+    "test:ui": "vitest run ui --passWithNoTests",
+    "test:watch": "vitest",
+    "test:e2e": "npm run build && playwright test"
+  },
+  "dependencies": {
+    "vue": "^3.5.34"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@playwright/test": "^1.58.2",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/chrome": "^0.1.36",
+    "@types/node": "^24.12.3",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.9.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.8.0",
+    "globals": "^16.2.0",
+    "happy-dom": "^20.7.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "tailwindcss": "^4.2.2",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^8.0.12",
+    "vitest": "^4.1.0",
+    "vue-eslint-parser": "^10.4.0",
+    "vue-tsc": "^3.2.8"
+  }
+}
