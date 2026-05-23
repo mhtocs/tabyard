@@ -43,6 +43,18 @@ load unpacked from `dist/` in chrome: extensions → developer mode → load unp
 
 iterative builds: `npm run watch` rebuilds `dist/` on change; reload the extension after each build.
 
+### playwright (e2e / screenshots only)
+
+`test:e2e`, `verify`, and `screenshots:readme` load the extension in playwright’s chromium (headed). (this browser is separate from your daily chrome profile)
+
+after `npm install`, run:
+
+```bash
+npx playwright install chromium
+```
+
+you do not need this to build the extension or load `dist/` in chrome.
+
 ## commands
 
 | command | purpose |
