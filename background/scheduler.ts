@@ -1,4 +1,5 @@
 import { EVALUATION_ALARM_NAME, syncEvaluationAlarm } from '../lib/engine/scheduler'
+import type { Settings } from '../lib/storage/schema'
 import { appendDevLog, readSettings } from '../lib/storage/chrome-storage'
 import { initializeExtension } from './setup'
 import { schedulerPorts } from './scheduler-ports'
@@ -29,6 +30,13 @@ export function registerSchedulerListeners(
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== 'local' || !changes.settings) {
+      return
+    }
+    const oldInterval = (changes.settings.oldValue as Settings | undefined)
+      ?.evaluationIntervalMinutes
+    const newInterval = (changes.settings.newValue as Settings | undefined)
+      ?.evaluationIntervalMinutes
+    if (oldInterval === newInterval) {
       return
     }
     void rescheduleEvaluationAlarm().catch((err: unknown) => {

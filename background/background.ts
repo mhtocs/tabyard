@@ -1,6 +1,7 @@
 import { runTabYardEvaluationCycle } from './evaluation-runner'
-import { registerGraveyardMessageListener } from './graveyard-restore'
-import { registerSchedulerListeners } from './scheduler'
+import { restoreFromGraveyard } from './graveyard-restore'
+import { registerRuntimeMessageListener } from './messages'
+import { registerSchedulerListeners, rescheduleEvaluationAlarm } from './scheduler'
 import { initializeExtension } from './setup'
 import { syncTabActivated, syncTabRemoved } from '../lib/activity/sync'
 import {
@@ -35,26 +36,14 @@ function registerActivityListeners(): void {
   })
 }
 
-function registerEvaluationMessageListener(): void {
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (message?.type !== 'run-evaluation-cycle') {
-      return
-    }
-    void runTabYardEvaluationCycle()
-      .then(() => sendResponse({ ok: true }))
-      .catch((err: unknown) => {
-        console.error('tabcleaner manual evaluation failed', err)
-        sendResponse({ ok: false })
-      })
-    return true
-  })
-}
-
 registerOpenDashboardOnActionClick()
 registerActivityListeners()
 registerSchedulerListeners(runTabYardEvaluationCycle)
-registerGraveyardMessageListener()
-registerEvaluationMessageListener()
+registerRuntimeMessageListener({
+  runCycle: runTabYardEvaluationCycle,
+  restoreGraveyard: restoreFromGraveyard,
+  rescheduleAlarm: rescheduleEvaluationAlarm,
+})
 
 chrome.runtime.onInstalled.addListener(() => {
   void initializeExtension({ runCycle: true }).catch((err: unknown) => {

@@ -27,22 +27,3 @@ export async function restoreFromGraveyard(entryId: string) {
   return result
 }
 
-export function registerGraveyardMessageListener(): void {
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (message?.type !== 'restore-graveyard' || typeof message.entryId !== 'string') {
-      return false
-    }
-
-    void restoreFromGraveyard(message.entryId)
-      .then((result) => sendResponse(result))
-      .catch((err: unknown) => {
-        sendResponse({
-          ok: false,
-          error: err instanceof Error ? err.message : 'restore failed',
-          entries: [],
-        })
-      })
-
-    return true
-  })
-}
