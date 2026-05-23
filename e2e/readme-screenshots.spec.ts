@@ -18,6 +18,15 @@ const outDir = path.resolve(
   '../docs/screenshots',
 )
 
+// keep / close / discard + url / inactive — copied from lib + e2e tests
+const readmeRules = [
+  'keep pinned=true', // seed.test, action-handlers.test
+  'keep url=docs.google.com', // evaluator.test
+  'close inactive>2h', // evaluator.test, extension.spec
+  'close inactive>10m url=docs.google.com', // evaluator.test
+  'discard inactive>7d', // action-handlers.test
+] as const
+
 test.describe.configure({ mode: 'serial' })
 
 test.beforeAll(() => {
@@ -51,7 +60,7 @@ test('capture readme screenshots', async ({ context, dashboardUrl }) => {
       title: 'vite dev server',
       closedAt: now - 5 * hour,
       action: 'close',
-      ruleText: 'close inactive>30d',
+      ruleText: 'close inactive>10m url=docs.google.com',
     },
   ]
 
@@ -64,7 +73,7 @@ test('capture readme screenshots', async ({ context, dashboardUrl }) => {
 
   await storageClear(context)
   await storageSet(context, {
-    settings: initialSettings(),
+    settings: { ...initialSettings(), rules: [...readmeRules] },
     graveyard,
     devLog,
     lastRun: { at: now - 3 * 60 * 1000, tabsEvaluated: 24, actionsTaken: 3 },
@@ -74,7 +83,11 @@ test('capture readme screenshots', async ({ context, dashboardUrl }) => {
   const page = await openDashboard(context, dashboardUrl)
   await page.setViewportSize({ width: 1100, height: 820 })
 
-  await page.locator('textarea').waitFor()
+  const textarea = page.locator('textarea')
+  await textarea.waitFor()
+  for (const line of readmeRules) {
+    await expect(textarea).toHaveValue(new RegExp(line.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
   await page.locator('header ul').waitFor()
   await page.screenshot({ path: path.join(outDir, 'rules.png') })
 

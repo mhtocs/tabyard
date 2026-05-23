@@ -10,7 +10,7 @@ captured from the built extension in headed chromium (`npm run screenshots:readm
 
 ### rules
 
-default editor: one rule per line, engine toggle, save / run now. header shows engine state, graveyard count, next run, last run.
+editor with sample rules from tests: `keep`, `close`, `discard`, plus `url=` and `inactive>`. one rule per line; engine toggle; save / run now.
 
 ![rules tab](docs/screenshots/rules.png)
 
