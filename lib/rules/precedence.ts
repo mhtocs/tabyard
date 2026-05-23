@@ -1,4 +1,5 @@
 import type { LifecycleAction } from '../storage/schema'
+import { isDestructiveAction } from '../engine/safety'
 import type { ParsedRule } from './types'
 import { specificityScore } from './specificity'
 
@@ -10,6 +11,21 @@ const ACTION_RANK: Record<LifecycleAction, number> = {
 }
 
 /** tab-state-only keeps (e.g. pinned=true) shield all close/discard; url/inactive keeps compete on score */
+export function urlPattern(rule: ParsedRule): string | undefined {
+  for (const condition of rule.conditions) {
+    if (condition.kind === 'url') {
+      return condition.pattern.toLowerCase()
+    }
+  }
+  return undefined
+}
+
+export function sameUrlPattern(a: ParsedRule, b: ParsedRule): boolean {
+  const patternA = urlPattern(a)
+  const patternB = urlPattern(b)
+  return patternA !== undefined && patternA === patternB
+}
+
 export function isShieldKeep(rule: ParsedRule): boolean {
   if (rule.action !== 'keep') {
     return false
@@ -32,7 +48,27 @@ export function resolveWinner(rules: ParsedRule[]): ParsedRule | null {
     return pickHighestSpecificity(shieldKeeps)
   }
 
-  return pickHighestSpecificity(rules, pickByActionPrecedence)
+  const winner = pickHighestSpecificity(rules, pickByActionPrecedence)
+  return preferKeepWhenSameUrlPattern(winner, rules)
+}
+
+/** same url= on keep and close → keep wins; narrower url on close still beats broader keep */
+function preferKeepWhenSameUrlPattern(
+  winner: ParsedRule,
+  candidates: ParsedRule[],
+): ParsedRule {
+  if (!isDestructiveAction(winner.action)) {
+    return winner
+  }
+
+  const sameUrlKeeps = candidates.filter(
+    (rule) => rule.action === 'keep' && sameUrlPattern(rule, winner),
+  )
+  if (sameUrlKeeps.length === 0) {
+    return winner
+  }
+
+  return pickHighestSpecificity(sameUrlKeeps)
 }
 
 function pickHighestSpecificity(
@@ -78,6 +114,7 @@ export type ResolutionReason =
   | 'higher specificity'
   | 'action precedence'
   | 'keep protection'
+  | 'same url keep'
 
 export function resolutionReason(
   winner: ParsedRule,
@@ -88,8 +125,14 @@ export function resolutionReason(
   }
 
   const destructive = candidates.filter((rule) => rule.action !== 'keep')
-  if (winner.action === 'keep' && destructive.length > 0 && isShieldKeep(winner)) {
-    return 'keep protection'
+  if (winner.action === 'keep' && destructive.length > 0) {
+    const bestDestructive = pickHighestSpecificity(destructive)
+    if (sameUrlPattern(winner, bestDestructive)) {
+      return 'same url keep'
+    }
+    if (isShieldKeep(winner)) {
+      return 'keep protection'
+    }
   }
 
   const winnerScore = specificityScore(winner)

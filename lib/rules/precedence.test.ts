@@ -122,6 +122,17 @@ describe('winner after matchRules', () => {
     expect(result.action).toBe('keep')
   })
 
+  it('keep google beats close google on mail when both use same url pattern', () => {
+    const ctx = tab({
+      url: 'https://mail.google.com/mail/u/0/#inbox',
+      inactiveMs: ELEVEN_MINUTES_MS,
+    })
+    const result = winnerAfterMatch([keepGoogle, closeGoogle], ctx)
+    expect(result.matchedCount).toBe(2)
+    expect(result.action).toBe('keep')
+    expect(result.reason).toBe('same url keep')
+  })
+
   it('keep google matches mail when glob close does not', () => {
     const ctx = tab({ url: 'https://mail.google.com/mail/u/0/' })
     const result = winnerAfterMatch([keepGoogle, closeGoogleGlob], ctx)
