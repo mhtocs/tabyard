@@ -6,10 +6,8 @@ function hasGlobSyntax(pattern: string): boolean {
   return pattern.includes('*') || pattern.includes('?')
 }
 
-/**
- * url patterns without * or ? match as case-insensitive substrings of the full tab url.
- * with wildcards: anchored glob (* any run, ? one char). no regex syntax in patterns.
- */
+// url patterns without * or ? match as case-insensitive substrings of the full tab url.
+// with wildcards: anchored glob (* any run, ? one char). no regex syntax in patterns.
 export function globMatch(
   pattern: string,
   value: string,

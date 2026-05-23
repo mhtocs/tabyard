@@ -24,10 +24,8 @@ function ruleDeclares(
   )
 }
 
-/**
- * hard stops before close/discard execute. runs after rule resolution.
- * pinned/audible/active: block unless the winning rule declares that flag true.
- */
+// hard stops before close/discard execute. runs after rule resolution.
+// pinned/audible/active: block unless the winning rule declares that flag true.
 export function checkDestructiveSafety(
   tab: TabMatchContext,
   winner: ParsedRule | null,

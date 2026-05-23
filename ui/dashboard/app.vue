@@ -4,6 +4,7 @@ import DashboardTabs, { type DashboardTab } from '../shared/components/dashboard
 import GraveyardTable from '../shared/components/graveyard-table.vue'
 import DevLogPanel from '../shared/components/dev-log-panel.vue'
 import RulesEditor from '../shared/components/rules-editor.vue'
+import SettingsPanel from '../shared/components/settings-panel.vue'
 import { ref } from 'vue'
 
 const activeTab = ref<DashboardTab>('rules')
@@ -35,7 +36,8 @@ const { statLines, loading: statsLoading } = useCycleStats()
         <div class="rounded-b border border-t-0 border-gray-300 bg-white">
           <RulesEditor v-if="activeTab === 'rules'" />
           <GraveyardTable v-else-if="activeTab === 'graveyard'" class="min-h-[28rem]" />
-          <DevLogPanel v-else />
+          <DevLogPanel v-else-if="activeTab === 'logs'" />
+          <SettingsPanel v-else />
         </div>
       </div>
     </div>

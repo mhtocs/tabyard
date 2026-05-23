@@ -17,4 +17,5 @@ iterative extension builds: `npm run watch` rebuilds `dist/` on change; reload t
 
 1. run `npm run build` before loading `dist/`.
 2. run `npm test` / `npm run test:ui` after logic or ui changes. 
-3. run `npm run test:e2e` for running end-to-end tests.
+3. run `npm run test:e2e` for end-to-end tests (headed chromium).
+4. run `npm run verify` for full gate (build + unit + ui + lint + e2e).

@@ -7,7 +7,7 @@ export type TabMatchContext = {
   pinned: boolean
   audible: boolean
   active: boolean
-  /** milliseconds since the tab was last active */
+  // milliseconds since the tab was last active
   inactiveMs: number
 }
 

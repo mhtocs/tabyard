@@ -1,5 +1,5 @@
 <script setup lang="ts">
-export type DashboardTab = 'rules' | 'graveyard' | 'logs'
+export type DashboardTab = 'rules' | 'graveyard' | 'logs' | 'settings'
 
 defineProps<{
   activeTab: DashboardTab
@@ -13,6 +13,7 @@ const tabs: { id: DashboardTab; label: string }[] = [
   { id: 'rules', label: 'rules' },
   { id: 'graveyard', label: 'graveyard' },
   { id: 'logs', label: 'logs' },
+  { id: 'settings', label: 'settings' },
 ]
 </script>
 

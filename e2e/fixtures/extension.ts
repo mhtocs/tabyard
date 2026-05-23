@@ -25,6 +25,8 @@ export const test = base.extend<{
   extensionId: string
   dashboardUrl: string
 }>({
+  // playwright fixture has no dependencies
+  // eslint-disable-next-line no-empty-pattern -- required by @playwright/test
   context: async ({}, use) => {
     // mv3 extensions need a headed browser; headless shell does not load service workers reliably
     const context = await chromium.launchPersistentContext('', {
@@ -87,7 +89,7 @@ export async function storageClear(context: BrowserContext): Promise<void> {
   })
 }
 
-/** trigger cycle from an extension page — sendMessage from the service worker alone fails */
+// trigger cycle from an extension page — sendMessage from the service worker alone fails
 export async function runEvaluationCycle(
   context: BrowserContext,
   dashboardUrl: string,
@@ -101,8 +103,21 @@ export async function runEvaluationCycle(
   await page.evaluate(() => chrome.runtime.sendMessage({ type: 'run-evaluation-cycle' }))
 }
 
-export async function clickDashboardTab(page: Page, tab: 'rules' | 'graveyard' | 'logs') {
+export async function clickDashboardTab(
+  page: Page,
+  tab: 'rules' | 'graveyard' | 'logs' | 'settings',
+) {
   await page.getByRole('button', { name: tab, exact: true }).click()
+}
+
+export async function getEvaluationAlarmPeriodMinutes(
+  context: BrowserContext,
+): Promise<number | undefined> {
+  const serviceWorker = await getExtensionServiceWorker(context)
+  return serviceWorker.evaluate(async () => {
+    const alarm = await chrome.alarms.get('tab-yard-evaluate')
+    return alarm?.periodInMinutes
+  })
 }
 
 export async function clickEngineToggle(page: Page) {

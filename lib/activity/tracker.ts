@@ -27,10 +27,8 @@ export function clearTabAccess(cache: ActivityCache, tabId: number): ActivityCac
   return next
 }
 
-/**
- * best known last-access time: max(chrome lastAccessed, shadow cache).
- * unknown access → nowMs so inactiveMs is 0 until we observe the tab.
- */
+// best known last-access time: max(chrome lastAccessed, shadow cache).
+// unknown access → nowMs so inactiveMs is 0 until we observe the tab.
 export function lastAccessedMs(
   tab: TabLastAccessSource,
   cache: ActivityCache,

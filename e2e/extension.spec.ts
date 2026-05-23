@@ -5,6 +5,7 @@ import {
   clickDashboardTab,
   clickEngineToggle,
   expect,
+  getEvaluationAlarmPeriodMinutes,
   openDashboard,
   runEvaluationCycle,
   storageClear,
@@ -219,6 +220,28 @@ test('evaluation closes matching tab and adds graveyard entry', async ({
       return stored.graveyard?.some((entry) => entry.url.includes('e2e-victim')) ?? false
     })
     .toBe(true)
+})
+
+test('settings interval change reschedules evaluation alarm', async ({ context, dashboardUrl }) => {
+  const page = await openDashboard(context, dashboardUrl)
+  await clickDashboardTab(page, 'settings')
+  await page.locator('select').waitFor()
+
+  await page.locator('select').selectOption('15')
+  await expect(page.getByText('settings saved')).toBeVisible()
+
+  await expect
+    .poll(() => getEvaluationAlarmPeriodMinutes(context))
+    .toBe(15)
+
+  await expect
+    .poll(async () => {
+      const stored = (await storageGet(context, 'settings')) as { settings: Settings }
+      return stored.settings.evaluationIntervalMinutes
+    })
+    .toBe(15)
+
+  await page.close()
 })
 
 test('restore writes a line to dev log', async ({ context, dashboardUrl }) => {

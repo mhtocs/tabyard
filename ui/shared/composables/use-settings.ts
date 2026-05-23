@@ -1,7 +1,8 @@
 import { DEFAULT_RULES } from '@/lib/defaults/rules'
 import { parseRules } from '@/lib/rules/parser'
 import { readSettings, writeSettings } from '@/lib/storage/chrome-storage'
-import type { Settings } from '@/lib/storage/schema'
+import { parseSettings } from '@/lib/storage/settings'
+import type { EvaluationIntervalMinutes, Settings } from '@/lib/storage/schema'
 import { useLocalStorageKeys } from './use-local-storage'
 import { onMounted, ref } from 'vue'
 
@@ -23,6 +24,8 @@ export function useSettings() {
   const saveMessage = ref<string | null>(null)
   const running = ref(false)
   const runError = ref<string | null>(null)
+  const scheduleError = ref<string | null>(null)
+  const scheduleMessage = ref<string | null>(null)
   const loading = ref(true)
 
   async function load() {
@@ -93,6 +96,43 @@ export function useSettings() {
     settings.value = { ...settings.value, engineEnabled: enabled }
   }
 
+  async function persistSchedule(
+    patch: Partial<Pick<Settings, 'evaluationIntervalMinutes' | 'graveyardRetentionDays'>>,
+  ): Promise<boolean> {
+    scheduleError.value = null
+    scheduleMessage.value = null
+
+    if (!settings.value) {
+      return false
+    }
+
+    const candidate = { ...settings.value, ...patch }
+    const parsed = parseSettings(candidate)
+    if (!parsed.ok) {
+      scheduleError.value = parsed.error
+      return false
+    }
+
+    const previousInterval = settings.value.evaluationIntervalMinutes
+    await writeSettings(parsed.settings)
+    settings.value = parsed.settings
+    scheduleMessage.value = 'settings saved'
+
+    if (parsed.settings.evaluationIntervalMinutes !== previousInterval) {
+      void chrome.runtime.sendMessage({ type: 'reschedule-evaluation-alarm' }).catch(() => {})
+    }
+
+    return true
+  }
+
+  async function setEvaluationIntervalMinutes(minutes: EvaluationIntervalMinutes) {
+    await persistSchedule({ evaluationIntervalMinutes: minutes })
+  }
+
+  async function setGraveyardRetentionDays(days: number) {
+    await persistSchedule({ graveyardRetentionDays: days })
+  }
+
   return {
     settings,
     rulesText,
@@ -100,9 +140,13 @@ export function useSettings() {
     saveMessage,
     running,
     runError,
+    scheduleError,
+    scheduleMessage,
     loading,
     saveRules,
     runNow,
     setEngineEnabled,
+    setEvaluationIntervalMinutes,
+    setGraveyardRetentionDays,
   }
 }

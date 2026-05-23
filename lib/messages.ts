@@ -1,4 +1,4 @@
-/** runtime messages between dashboard ui and mv3 background */
+// runtime messages between dashboard ui and mv3 background
 
 export type RunEvaluationCycleMessage = { type: 'run-evaluation-cycle' }
 export type RestoreGraveyardMessage = { type: 'restore-graveyard'; entryId: string }

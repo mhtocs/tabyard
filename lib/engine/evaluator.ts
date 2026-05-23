@@ -8,7 +8,7 @@ export type TabEvaluationInput = TabMatchContext & {
   tabId: number
   url: string
   title: string
-  /** epoch ms — best known last time tab was active */
+  // epoch ms — best known last time tab was active
   lastAccessedMs: number
 }
 

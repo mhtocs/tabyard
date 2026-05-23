@@ -3,14 +3,14 @@ import { isDestructiveAction } from '../engine/safety'
 import type { ParsedRule } from './types'
 import { specificityScore } from './specificity'
 
-/** higher rank wins when specificity is tied (keep > close > discard) */
+// higher rank wins when specificity is tied (keep > close > discard)
 const ACTION_RANK: Record<LifecycleAction, number> = {
   keep: 3,
   close: 2,
   discard: 1,
 }
 
-/** tab-state-only keeps (e.g. pinned=true) shield all close/discard; url/inactive keeps compete on score */
+// tab-state-only keeps (e.g. pinned=true) shield all close/discard; url/inactive keeps compete on score
 export function urlPattern(rule: ParsedRule): string | undefined {
   for (const condition of rule.conditions) {
     if (condition.kind === 'url') {
@@ -52,7 +52,7 @@ export function resolveWinner(rules: ParsedRule[]): ParsedRule | null {
   return preferKeepWhenSameUrlPattern(winner, rules)
 }
 
-/** same url= on keep and close → keep wins; narrower url on close still beats broader keep */
+// same url= on keep and close → keep wins; narrower url on close still beats broader keep
 function preferKeepWhenSameUrlPattern(
   winner: ParsedRule,
   candidates: ParsedRule[],
@@ -100,7 +100,7 @@ function pickBySpecificity(
   return tieBreak(a, b)
 }
 
-/** destructive rules only — specificity first, then keep > close > discard */
+// destructive rules only — specificity first, then keep > close > discard
 export function pickWinner(a: ParsedRule, b: ParsedRule): ParsedRule {
   return pickBySpecificity(a, b, pickByActionPrecedence)
 }

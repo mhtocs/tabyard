@@ -5,7 +5,7 @@ const UNITS = [
   { ms: 1_000, suffix: 's' },
 ] as const
 
-/** compact duration: 45s, 12m, 2h, 1d */
+// compact duration: 45s, 12m, 2h, 1d
 export function formatDurationShort(ms: number): string {
   const safe = Math.max(0, ms)
   if (safe < 1_000) {
@@ -20,7 +20,7 @@ export function formatDurationShort(ms: number): string {
   return '0s'
 }
 
-/** human past time: just now, 2m ago, 1d ago */
+// human past time: just now, 2m ago, 1d ago
 export function formatTimeAgo(atMs: number, nowMs = Date.now()): string {
   if (!Number.isFinite(atMs) || atMs <= 0) {
     return '—'
@@ -32,7 +32,7 @@ export function formatTimeAgo(atMs: number, nowMs = Date.now()): string {
   return `${formatDurationShort(diff)} ago`
 }
 
-/** human future time: now, in 45s, in 5m */
+// human future time: now, in 45s, in 5m
 export function formatTimeUntil(atMs: number | null | undefined, nowMs = Date.now()): string {
   if (atMs === undefined || atMs === null || !Number.isFinite(atMs) || atMs <= 0) {
     return '—'

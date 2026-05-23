@@ -4,7 +4,7 @@ export const EVALUATION_INTERVALS: readonly EvaluationIntervalMinutes[] = [
   1, 5, 15, 30, 60,
 ] as const
 
-/** close = remove tab + graveyard; discard = remove tab only; keep = no removal */
+// close = remove tab + graveyard; discard = remove tab only; keep = no removal
 export type LifecycleAction = 'keep' | 'close' | 'discard'
 
 export type Settings = {
@@ -26,7 +26,7 @@ export type GraveyardEntry = {
 
 export type ActivityCache = Record<string, number>
 
-/** plain-text dev log line stored in chrome.storage */
+// plain-text dev log line stored in chrome.storage
 export type DevLogEntry = {
   id: string
   at: number
