@@ -15,11 +15,6 @@ export type BooleanTabCondition = {
   value: boolean
 }
 
-export type DomainCondition = {
-  kind: 'domain'
-  pattern: string
-}
-
 export type UrlCondition = {
   kind: 'url'
   pattern: string
@@ -28,7 +23,6 @@ export type UrlCondition = {
 export type RuleCondition =
   | InactiveCondition
   | BooleanTabCondition
-  | DomainCondition
   | UrlCondition
 
 export type ParsedRule = {

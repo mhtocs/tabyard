@@ -43,41 +43,11 @@ function conditionMatches(
       return tab.audible === condition.value
     case 'active':
       return tab.active === condition.value
-    case 'domain':
-      return matchDomainPattern(condition.pattern, tab.url)
     case 'url':
       return globMatch(condition.pattern, tab.url, { ignoreCase: true })
     default: {
       const _exhaustive: never = condition
       return _exhaustive
     }
-  }
-}
-
-function matchDomainPattern(pattern: string, url: string): boolean {
-  const host = hostnameFromUrl(url)
-  if (!host) {
-    return false
-  }
-
-  const normalizedPattern = pattern.toLowerCase()
-  const normalizedHost = host.toLowerCase()
-
-  if (normalizedPattern.startsWith('*.')) {
-    const suffix = normalizedPattern.slice(1)
-    const apex = suffix.slice(1)
-    return (
-      normalizedHost === apex || normalizedHost.endsWith(suffix)
-    )
-  }
-
-  return globMatch(pattern, host, { ignoreCase: true })
-}
-
-function hostnameFromUrl(url: string): string | null {
-  try {
-    return new URL(url).hostname
-  } catch {
-    return null
   }
 }

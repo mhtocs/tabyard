@@ -2,14 +2,25 @@ export type GlobMatchOptions = {
   ignoreCase?: boolean
 }
 
+function hasGlobSyntax(pattern: string): boolean {
+  return pattern.includes('*') || pattern.includes('?')
+}
+
 /**
- * simple glob: * (any run), ? (one char). no regex syntax in patterns.
+ * url patterns without * or ? match as case-insensitive substrings of the full tab url.
+ * with wildcards: anchored glob (* any run, ? one char). no regex syntax in patterns.
  */
 export function globMatch(
   pattern: string,
   value: string,
   options: GlobMatchOptions = {},
 ): boolean {
+  if (!hasGlobSyntax(pattern)) {
+    if (options.ignoreCase) {
+      return value.toLowerCase().includes(pattern.toLowerCase())
+    }
+    return value.includes(pattern)
+  }
   const flags = options.ignoreCase ? 'i' : ''
   const re = globToRegExp(pattern, flags)
   return re.test(value)

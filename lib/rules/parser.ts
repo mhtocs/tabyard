@@ -11,7 +11,6 @@ const ACTIONS: readonly LifecycleAction[] = ['keep', 'close', 'discard']
 
 const INACTIVE_RE = /^inactive>(\d+)(m|h|d)$/i
 const BOOLEAN_CONDITION_RE = /^(pinned|audible|active)=(true|false)$/i
-const DOMAIN_RE = /^domain=(.+)$/i
 const URL_RE = /^url=(.+)$/i
 
 export function parseRule(line: string): ParseRuleResult {
@@ -142,15 +141,6 @@ function parseConditionToken(
     const kind = booleanMatch[1]!.toLowerCase() as 'pinned' | 'audible' | 'active'
     const value = booleanMatch[2] === 'true'
     return { ok: true, condition: { kind, value } }
-  }
-
-  const domainMatch = DOMAIN_RE.exec(token)
-  if (domainMatch) {
-    const pattern = domainMatch[1]!.trim()
-    if (pattern.length === 0) {
-      return { ok: false, error: 'domain pattern cannot be empty' }
-    }
-    return { ok: true, condition: { kind: 'domain', pattern } }
   }
 
   const urlMatch = URL_RE.exec(token)

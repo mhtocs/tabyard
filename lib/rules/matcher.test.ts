@@ -29,26 +29,35 @@ describe('ruleMatches inactive', () => {
   })
 })
 
-describe('ruleMatches domain', () => {
-  // ac 16
-  it('matches subdomain for domain=*.youtube.com', () => {
-    const rule = parseRule('close domain=*.youtube.com inactive>1h')
+describe('ruleMatches url', () => {
+  // ac 16 — glob on full url, case-insensitive
+  it('matches youtube url pattern', () => {
+    const rule = parseRule('close url=*youtube.com* inactive>1h')
     expect(
       rule.ok &&
         ruleMatches(rule.rule, tab({ url: 'https://music.youtube.com/watch?v=1' })),
     ).toBe(true)
   })
 
-  it('does not match unrelated domain', () => {
-    const rule = parseRule('close domain=*.youtube.com inactive>1h')
+  it('does not match unrelated url', () => {
+    const rule = parseRule('close url=*youtube.com* inactive>1h')
     expect(
       rule.ok && ruleMatches(rule.rule, tab({ url: 'https://example.com/' })),
     ).toBe(false)
   })
-})
 
-describe('ruleMatches url', () => {
   // ac 17
+  it('matches plain url substring without wildcards', () => {
+    const rule = parseRule('close url=reddit.com/r/cats inactive>1h')
+    expect(
+      rule.ok &&
+        ruleMatches(rule.rule, tab({ url: 'https://www.reddit.com/r/cats/comments/1' })),
+    ).toBe(true)
+    expect(
+      rule.ok && ruleMatches(rule.rule, tab({ url: 'https://www.reddit.com/r/dogs' })),
+    ).toBe(false)
+  })
+
   it('matches path glob on full url', () => {
     const rule = parseRule('close url=*reddit.com/r/* inactive>1h')
     expect(
@@ -57,6 +66,22 @@ describe('ruleMatches url', () => {
           rule.rule,
           tab({ url: 'https://www.reddit.com/r/programming/comments/abc' }),
         ),
+    ).toBe(true)
+  })
+
+  it('does not match anchored *.google.com when url has a path', () => {
+    const rule = parseRule('close url=*.google.com inactive>10m')
+    expect(
+      rule.ok &&
+        ruleMatches(rule.rule, tab({ url: 'https://mail.google.com/mail/u/0/' })),
+    ).toBe(false)
+  })
+
+  it('matches anchored *.google.com when url ends at host', () => {
+    const rule = parseRule('close url=*.google.com inactive>10m')
+    expect(
+      rule.ok &&
+        ruleMatches(rule.rule, tab({ url: 'https://calendar.google.com' })),
     ).toBe(true)
   })
 })

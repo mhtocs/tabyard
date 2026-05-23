@@ -14,19 +14,19 @@ describe('parseRule', () => {
     }
   })
 
-  it('parses keep with domain condition', () => {
-    const result = parseRule('keep domain=docs.google.com')
+  it('parses keep with url condition', () => {
+    const result = parseRule('keep url=*docs.google.com*')
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.rule.action).toBe('keep')
       expect(result.rule.conditions).toEqual([
-        { kind: 'domain', pattern: 'docs.google.com' },
+        { kind: 'url', pattern: '*docs.google.com*' },
       ])
     }
   })
 
-  it('parses discard with domain and inactive', () => {
-    const result = parseRule('discard domain=*.example.com inactive>7d')
+  it('parses discard with url and inactive', () => {
+    const result = parseRule('discard url=*example.com* inactive>7d')
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.rule.action).toBe('discard')
