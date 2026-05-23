@@ -1,4 +1,3 @@
-import { appendGraveyardEntry, createGraveyardEntry } from '../graveyard/store'
 import type { GraveyardEntry } from '../storage/schema'
 import type { ActionContext, ActionHandlers, ActionResult } from './actions'
 
@@ -16,14 +15,17 @@ async function closeTab(
   deps: ActionHandlerDeps,
   ctx: ActionContext,
 ): Promise<ActionResult> {
-  const entry = createGraveyardEntry({
+  const entry: GraveyardEntry = {
+    id: crypto.randomUUID(),
     url: ctx.tab.url,
     title: ctx.tab.title,
     favicon: ctx.tab.favicon,
+    closedAt: Date.now(),
+    action: 'close',
     ruleText: ctx.ruleText,
-  })
+  }
   const graveyard = await deps.readGraveyard()
-  await deps.writeGraveyard(appendGraveyardEntry(graveyard, entry))
+  await deps.writeGraveyard([...graveyard, entry])
   await deps.removeTab(ctx.tab.tabId)
   return { tabRemoved: true, graveyardEntryId: entry.id }
 }

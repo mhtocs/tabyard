@@ -1,4 +1,5 @@
 import { createEvaluationCyclePorts } from './evaluation-ports'
+import { registerGraveyardMessageListener } from './graveyard-restore'
 import { registerSchedulerListeners, rescheduleEvaluationAlarm } from './scheduler'
 import { syncTabActivated, syncTabRemoved } from '../lib/activity/sync'
 import { runEvaluationCycle } from '../lib/engine/evaluation-cycle'
@@ -48,6 +49,7 @@ console.log('tabyard background loaded')
 
 registerActivityListeners()
 registerSchedulerListeners(runTabYardEvaluationCycle)
+registerGraveyardMessageListener()
 
 chrome.runtime.onInstalled.addListener(() => {
   void seedStorageIfEmpty()
