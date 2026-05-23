@@ -104,3 +104,7 @@ export async function runEvaluationCycle(
 export async function clickDashboardTab(page: Page, tab: 'rules' | 'graveyard' | 'logs') {
   await page.getByRole('button', { name: tab, exact: true }).click()
 }
+
+export async function clickEngineToggle(page: Page) {
+  await page.locator('label').filter({ hasText: 'engine' }).locator('button').click()
+}
