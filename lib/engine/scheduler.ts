@@ -2,7 +2,12 @@ import type { EvaluationIntervalMinutes } from '../storage/schema'
 
 export const EVALUATION_ALARM_NAME = 'tab-yard-evaluate'
 
+export type SchedulerAlarm = {
+  periodInMinutes?: number
+}
+
 export type SchedulerPorts = {
+  getAlarm: (name: string) => Promise<SchedulerAlarm | undefined>
   clearAlarm: (name: string) => Promise<boolean>
   createAlarm: (name: string, periodInMinutes: EvaluationIntervalMinutes) => Promise<void>
 }
@@ -16,6 +21,14 @@ export async function syncEvaluationAlarm(
   await ports.createAlarm(EVALUATION_ALARM_NAME, periodInMinutes)
 }
 
-export function isEvaluationAlarm(name: string): boolean {
-  return name === EVALUATION_ALARM_NAME
+/** keep existing alarm when interval unchanged — avoids resetting the timer on every sw wake */
+export async function syncEvaluationAlarmIfNeeded(
+  ports: SchedulerPorts,
+  periodInMinutes: EvaluationIntervalMinutes,
+): Promise<void> {
+  const existing = await ports.getAlarm(EVALUATION_ALARM_NAME)
+  if (existing?.periodInMinutes === periodInMinutes) {
+    return
+  }
+  await syncEvaluationAlarm(ports, periodInMinutes)
 }

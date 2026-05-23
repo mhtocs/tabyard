@@ -1,5 +1,6 @@
 import { EVALUATION_ALARM_NAME, syncEvaluationAlarm } from '../lib/engine/scheduler'
-import { readSettings } from '../lib/storage/chrome-storage'
+import { appendDevLog, readSettings } from '../lib/storage/chrome-storage'
+import { initializeExtension } from './setup'
 import { schedulerPorts } from './scheduler-ports'
 
 export async function rescheduleEvaluationAlarm(): Promise<void> {
@@ -8,20 +9,21 @@ export async function rescheduleEvaluationAlarm(): Promise<void> {
 }
 
 export function registerSchedulerListeners(
-  onEvaluate: () => Promise<void>,
+  onEvaluate: () => Promise<unknown>,
 ): void {
   chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name !== EVALUATION_ALARM_NAME) {
       return
     }
+    void appendDevLog('alarm fired')
     void onEvaluate().catch((err: unknown) => {
-      console.error('tab yard evaluation cycle failed', err)
+      console.error('tabcleaner evaluation cycle failed', err)
     })
   })
 
   chrome.runtime.onStartup.addListener(() => {
-    void rescheduleEvaluationAlarm().catch((err: unknown) => {
-      console.error('tab yard startup alarm schedule failed', err)
+    void initializeExtension({ runCycle: true }).catch((err: unknown) => {
+      console.error('tabcleaner startup init failed', err)
     })
   })
 
@@ -30,7 +32,7 @@ export function registerSchedulerListeners(
       return
     }
     void rescheduleEvaluationAlarm().catch((err: unknown) => {
-      console.error('tab yard settings alarm reschedule failed', err)
+      console.error('tabcleaner settings alarm reschedule failed', err)
     })
   })
 }

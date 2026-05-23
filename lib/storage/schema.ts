@@ -26,16 +26,11 @@ export type GraveyardEntry = {
 
 export type ActivityCache = Record<string, number>
 
-export type LifecycleLogEntry = {
+/** plain-text dev log line stored in chrome.storage */
+export type DevLogEntry = {
   id: string
   at: number
-  tabId: number
-  url: string
-  title: string
-  matchedRules: string[]
-  resolvedAction: LifecycleAction | null
-  resolutionReason: string
-  executed: boolean
+  message: string
 }
 
 export type LastRunSummary = {
@@ -48,6 +43,6 @@ export const STORAGE_KEYS = {
   settings: 'settings',
   graveyard: 'graveyard',
   activityCache: 'activityCache',
-  lifecycleLog: 'lifecycleLog',
+  devLog: 'devLog',
   lastRun: 'lastRun',
 } as const

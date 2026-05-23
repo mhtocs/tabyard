@@ -1,6 +1,6 @@
-# tabyard
+# tabcleaner
 
-chrome extension: deterministic tab lifecycle rules, graveyard recovery, transparent logs.
+chrome extension: plain-text tab rules, scheduled cleanup, graveyard restore, dev logs.
 
 ## setup
 

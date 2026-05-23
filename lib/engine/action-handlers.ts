@@ -45,11 +45,3 @@ export function createActionHandlers(deps: ActionHandlerDeps): ActionHandlers {
     discard: (ctx) => discardTab(deps, ctx),
   }
 }
-
-export async function executeAction(
-  handlers: ActionHandlers,
-  action: keyof ActionHandlers,
-  ctx: ActionContext,
-): Promise<ActionResult> {
-  return handlers[action](ctx)
-}

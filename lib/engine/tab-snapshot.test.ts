@@ -23,6 +23,7 @@ describe('toTabEvaluationInput', () => {
       audible: false,
       active: true,
       inactiveMs: 120_000,
+      lastAccessedMs: now - 120_000,
     })
   })
 

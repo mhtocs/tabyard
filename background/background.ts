@@ -1,60 +1,67 @@
-import { createEvaluationCyclePorts } from './evaluation-ports'
+import { runTabYardEvaluationCycle } from './evaluation-runner'
 import { registerGraveyardMessageListener } from './graveyard-restore'
-import { registerSchedulerListeners, rescheduleEvaluationAlarm } from './scheduler'
+import { registerSchedulerListeners } from './scheduler'
+import { initializeExtension } from './setup'
 import { syncTabActivated, syncTabRemoved } from '../lib/activity/sync'
-import { runEvaluationCycle } from '../lib/engine/evaluation-cycle'
-import { initialSettings, shouldSeedSettings } from '../lib/defaults/seed'
 import {
   readActivityCache,
-  readSettingsRaw,
   writeActivityCache,
-  writeSettings,
 } from '../lib/storage/chrome-storage'
+
+const DASHBOARD_PATH = 'ui/dashboard/index.html'
 
 const activityPorts = {
   readCache: readActivityCache,
   writeCache: writeActivityCache,
 }
 
-export async function seedStorageIfEmpty(): Promise<void> {
-  const stored = await readSettingsRaw()
-  if (!shouldSeedSettings(stored)) {
-    return
-  }
-  await writeSettings(initialSettings())
+function registerOpenDashboardOnActionClick(): void {
+  chrome.action.onClicked.addListener(() => {
+    void chrome.tabs.create({ url: chrome.runtime.getURL(DASHBOARD_PATH) })
+  })
 }
 
 function registerActivityListeners(): void {
   chrome.tabs.onActivated.addListener((activeInfo) => {
     void syncTabActivated(activityPorts, activeInfo.tabId).catch((err: unknown) => {
-      console.error('tab yard tab activated sync failed', err)
+      console.error('tabcleaner tab activated sync failed', err)
     })
   })
 
   chrome.tabs.onRemoved.addListener((tabId) => {
     void syncTabRemoved(activityPorts, tabId).catch((err: unknown) => {
-      console.error('tab yard tab removed sync failed', err)
+      console.error('tabcleaner tab removed sync failed', err)
     })
   })
 }
 
-export async function runTabYardEvaluationCycle(): Promise<void> {
-  const result = await runEvaluationCycle(createEvaluationCyclePorts())
-  if (!result.skipped) {
-    console.log('tab yard cycle finished', result)
-  }
+function registerEvaluationMessageListener(): void {
+  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message?.type !== 'run-evaluation-cycle') {
+      return
+    }
+    void runTabYardEvaluationCycle()
+      .then(() => sendResponse({ ok: true }))
+      .catch((err: unknown) => {
+        console.error('tabcleaner manual evaluation failed', err)
+        sendResponse({ ok: false })
+      })
+    return true
+  })
 }
 
-console.log('tabyard background loaded')
-
+registerOpenDashboardOnActionClick()
 registerActivityListeners()
 registerSchedulerListeners(runTabYardEvaluationCycle)
 registerGraveyardMessageListener()
+registerEvaluationMessageListener()
 
 chrome.runtime.onInstalled.addListener(() => {
-  void seedStorageIfEmpty()
-    .then(() => rescheduleEvaluationAlarm())
-    .catch((err: unknown) => {
-      console.error('tab yard install setup failed', err)
-    })
+  void initializeExtension({ runCycle: true }).catch((err: unknown) => {
+    console.error('tabcleaner install setup failed', err)
+  })
+})
+
+void initializeExtension().catch((err: unknown) => {
+  console.error('tabcleaner background init failed', err)
 })

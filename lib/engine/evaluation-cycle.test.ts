@@ -16,7 +16,6 @@ function baseSettings(overrides: Partial<Settings> = {}): Settings {
 
 function ports(overrides: Partial<EvaluationCyclePorts> = {}): EvaluationCyclePorts {
   const graveyard: import('../storage/schema').GraveyardEntry[] = []
-  const log: import('../storage/schema').LifecycleLogEntry[] = []
 
   return {
     readSettings: async () => baseSettings(),
@@ -37,11 +36,6 @@ function ports(overrides: Partial<EvaluationCyclePorts> = {}): EvaluationCyclePo
       graveyard.length = 0
       graveyard.push(...entries)
     },
-    readLifecycleLog: async () => log,
-    writeLifecycleLog: async (entries) => {
-      log.length = 0
-      log.push(...entries)
-    },
     writeLastRun: async () => {},
     removeTab: vi.fn().mockResolvedValue(undefined),
     ...overrides,
@@ -49,7 +43,6 @@ function ports(overrides: Partial<EvaluationCyclePorts> = {}): EvaluationCyclePo
 }
 
 describe('runEvaluationCycle', () => {
-  // ac 14
   it('skips entire cycle when engine is disabled', async () => {
     const removeTab = vi.fn()
     const result = await runEvaluationCycle(
@@ -58,7 +51,12 @@ describe('runEvaluationCycle', () => {
         removeTab,
       }),
     )
-    expect(result).toEqual({ skipped: true, tabsEvaluated: 0, actionsTaken: 0 })
+    expect(result).toEqual({
+      skipped: true,
+      skipReason: 'engine_off',
+      tabsEvaluated: 0,
+      actionsTaken: 0,
+    })
     expect(removeTab).not.toHaveBeenCalled()
   })
 
@@ -77,7 +75,6 @@ describe('runEvaluationCycle', () => {
     expect(graveyard[0]!.url).toBe('https://example.com/page')
   })
 
-  // ac 15
   it('discards without graveyard entry', async () => {
     const removeTab = vi.fn().mockResolvedValue(undefined)
     const p = ports({

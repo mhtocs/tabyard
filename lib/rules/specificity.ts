@@ -8,13 +8,9 @@ const CONDITION_WEIGHT: Record<RuleCondition['kind'], number> = {
   url: 4,
 }
 
-export function conditionWeight(condition: RuleCondition): number {
-  return CONDITION_WEIGHT[condition.kind]
-}
-
 export function specificityScore(rule: ParsedRule): number {
   return rule.conditions.reduce(
-    (sum, condition) => sum + conditionWeight(condition),
+    (sum, condition) => sum + CONDITION_WEIGHT[condition.kind],
     0,
   )
 }

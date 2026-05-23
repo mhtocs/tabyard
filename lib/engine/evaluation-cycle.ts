@@ -1,17 +1,12 @@
 import { pruneGraveyardByRetention } from '../graveyard/store'
-import {
-  appendLifecycleLogEntry,
-  logEntryFromEvaluation,
-} from '../logs/lifecycle-log'
 import { parseRules } from '../rules/parser'
 import type {
   ActivityCache,
   GraveyardEntry,
   LastRunSummary,
-  LifecycleLogEntry,
   Settings,
 } from '../storage/schema'
-import { createActionHandlers, executeAction } from './action-handlers'
+import { createActionHandlers } from './action-handlers'
 import { evaluateTab } from './evaluator'
 import { toTabEvaluationInput, type ChromeTabSnapshot } from './tab-snapshot'
 
@@ -22,8 +17,6 @@ export type EvaluationCyclePorts = {
   readActivityCache: () => Promise<ActivityCache>
   readGraveyard: () => Promise<GraveyardEntry[]>
   writeGraveyard: (entries: GraveyardEntry[]) => Promise<void>
-  readLifecycleLog: () => Promise<LifecycleLogEntry[]>
-  writeLifecycleLog: (entries: LifecycleLogEntry[]) => Promise<void>
   writeLastRun: (summary: LastRunSummary) => Promise<void>
   removeTab: (tabId: number) => Promise<void>
   onTabError?: (tabId: number, error: unknown) => void
@@ -31,6 +24,8 @@ export type EvaluationCyclePorts = {
 
 export type EvaluationCycleResult = {
   skipped: boolean
+  skipReason?: 'engine_off'
+  rulesError?: string
   tabsEvaluated: number
   actionsTaken: number
 }
@@ -42,13 +37,23 @@ export async function runEvaluationCycle(
   const settings = await ports.readSettings()
 
   if (!settings.engineEnabled) {
-    return { skipped: true, tabsEvaluated: 0, actionsTaken: 0 }
+    return {
+      skipped: true,
+      skipReason: 'engine_off',
+      tabsEvaluated: 0,
+      actionsTaken: 0,
+    }
   }
 
   const parsedRules = parseRules(settings.rules)
   if (!parsedRules.ok) {
     ports.onTabError?.(0, new Error(parsedRules.error))
-    return { skipped: false, tabsEvaluated: 0, actionsTaken: 0 }
+    return {
+      skipped: false,
+      rulesError: parsedRules.error,
+      tabsEvaluated: 0,
+      actionsTaken: 0,
+    }
   }
 
   const rules = parsedRules.rules
@@ -64,7 +69,6 @@ export async function runEvaluationCycle(
 
   let tabsEvaluated = 0
   let actionsTaken = 0
-  let lifecycleLog = await ports.readLifecycleLog()
 
   for (const chromeTab of tabs) {
     const tabId = chromeTab.id
@@ -80,10 +84,9 @@ export async function runEvaluationCycle(
 
       tabsEvaluated++
       const outcome = evaluateTab(rules, input)
-      let executed = false
 
       if (outcome.executed && outcome.resolvedAction && outcome.winner) {
-        await executeAction(handlers, outcome.resolvedAction, {
+        await handlers[outcome.resolvedAction]({
           tab: {
             tabId: input.tabId,
             url: input.url,
@@ -93,19 +96,11 @@ export async function runEvaluationCycle(
           ruleText: outcome.winner.source,
         })
         actionsTaken++
-        executed = true
       }
-
-      lifecycleLog = appendLifecycleLogEntry(
-        lifecycleLog,
-        logEntryFromEvaluation(input, outcome, nowMs, executed),
-      )
     } catch (error) {
       ports.onTabError?.(tabId, error)
     }
   }
-
-  await ports.writeLifecycleLog(lifecycleLog)
 
   const graveyard = await ports.readGraveyard()
   const pruned = pruneGraveyardByRetention(

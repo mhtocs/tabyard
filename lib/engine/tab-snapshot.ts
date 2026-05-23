@@ -1,4 +1,4 @@
-import { inactiveMsForTab } from '../activity/tracker'
+import { inactiveMsForTab, lastAccessedMs } from '../activity/tracker'
 import type { ActivityCache } from '../storage/schema'
 import type { TabEvaluationInput } from './evaluator'
 
@@ -30,5 +30,6 @@ export function toTabEvaluationInput(
     audible: tab.audible ?? false,
     active: tab.id === activeTabId,
     inactiveMs: inactiveMsForTab(tab, cache, nowMs),
+    lastAccessedMs: lastAccessedMs(tab, cache, nowMs),
   }
 }

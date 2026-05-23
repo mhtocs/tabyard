@@ -1,5 +1,5 @@
 import { restoreGraveyardEntry } from '../lib/graveyard/restore'
-import { readGraveyard, writeGraveyard } from '../lib/storage/chrome-storage'
+import { appendDevLog, readGraveyard, writeGraveyard } from '../lib/storage/chrome-storage'
 
 function openTab(url: string): Promise<number | undefined> {
   return new Promise((resolve, reject) => {
@@ -18,9 +18,11 @@ const restorePorts = { openTab }
 
 export async function restoreFromGraveyard(entryId: string) {
   const entries = await readGraveyard()
+  const entry = entries.find((item) => item.id === entryId)
   const result = await restoreGraveyardEntry(restorePorts, entries, entryId)
-  if (result.ok) {
+  if (result.ok && entry) {
     await writeGraveyard(result.entries)
+    await appendDevLog(`restored · ${entry.title || 'untitled'} · ${entry.url}`)
   }
   return result
 }

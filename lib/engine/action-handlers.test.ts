@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createActionHandlers, executeAction } from './action-handlers'
+import { createActionHandlers } from './action-handlers'
 
 describe('action handlers', () => {
   const tab = { tabId: 42, url: 'https://example.com', title: 'example' }
@@ -13,7 +13,7 @@ describe('action handlers', () => {
       writeGraveyard,
     })
 
-    const result = await executeAction(handlers, 'keep', {
+    const result = await handlers.keep({
       tab,
       ruleText: 'keep pinned=true',
     })
@@ -33,7 +33,7 @@ describe('action handlers', () => {
       writeGraveyard,
     })
 
-    const result = await executeAction(handlers, 'close', {
+    const result = await handlers.close({
       tab,
       ruleText: 'close inactive>30d',
     })
@@ -58,7 +58,7 @@ describe('action handlers', () => {
       writeGraveyard,
     })
 
-    const result = await executeAction(handlers, 'discard', {
+    const result = await handlers.discard({
       tab,
       ruleText: 'discard inactive>7d',
     })

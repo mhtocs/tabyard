@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_RULES } from './rules'
-import { initialSettings, shouldSeedSettings } from './seed'
+import { initialSettings } from './seed'
 
 describe('DEFAULT_RULES', () => {
   it('includes keep and close system defaults', () => {
@@ -22,14 +22,3 @@ describe('initialSettings', () => {
   })
 })
 
-describe('shouldSeedSettings', () => {
-  it('returns true when settings key is missing', () => {
-    expect(shouldSeedSettings(undefined)).toBe(true)
-    expect(shouldSeedSettings(null)).toBe(true)
-  })
-
-  it('returns false when settings already exist', () => {
-    expect(shouldSeedSettings({ engineEnabled: true })).toBe(false)
-    expect(shouldSeedSettings([])).toBe(false)
-  })
-})

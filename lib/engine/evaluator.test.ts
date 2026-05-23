@@ -15,6 +15,7 @@ function tab(overrides: Record<string, unknown> = {}) {
     audible: false,
     active: false,
     inactiveMs: THREE_HOURS_MS,
+    lastAccessedMs: Date.now() - THREE_HOURS_MS,
     ...overrides,
   }
 }

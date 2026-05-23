@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_SETTINGS } from './settings'
-import {
-  isEvaluationIntervalMinutes,
-  mergeSettings,
-  parseSettings,
-} from './settings'
+import { isEvaluationIntervalMinutes, parseSettings } from './settings'
 
 describe('parseSettings', () => {
   it('returns defaults when storage is empty', () => {
@@ -44,14 +40,16 @@ describe('parseSettings', () => {
     })
   })
 
-  it('rejects non-positive graveyard retention', () => {
-    const result = parseSettings({
-      engineEnabled: true,
-      evaluationIntervalMinutes: 5,
-      graveyardRetentionDays: 0,
-      rules: [],
-    })
-    expect(result.ok).toBe(false)
+  it('rejects graveyard retention below 10 days', () => {
+    for (const graveyardRetentionDays of [0, 5, 9]) {
+      const result = parseSettings({
+        engineEnabled: true,
+        evaluationIntervalMinutes: 5,
+        graveyardRetentionDays,
+        rules: [],
+      })
+      expect(result.ok).toBe(false)
+    }
   })
 })
 
@@ -60,15 +58,5 @@ describe('isEvaluationIntervalMinutes', () => {
     expect(isEvaluationIntervalMinutes(1)).toBe(true)
     expect(isEvaluationIntervalMinutes(60)).toBe(true)
     expect(isEvaluationIntervalMinutes(2)).toBe(false)
-  })
-})
-
-describe('mergeSettings', () => {
-  it('fills missing fields from defaults', () => {
-    expect(mergeSettings({ engineEnabled: false })).toMatchObject({
-      engineEnabled: false,
-      evaluationIntervalMinutes: 5,
-      graveyardRetentionDays: 90,
-    })
   })
 })

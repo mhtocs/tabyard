@@ -8,7 +8,3 @@ export function initialSettings(): Settings {
     rules: [...DEFAULT_RULES],
   }
 }
-
-export function shouldSeedSettings(storedRaw: unknown): boolean {
-  return storedRaw === undefined || storedRaw === null
-}

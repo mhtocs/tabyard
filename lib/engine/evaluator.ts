@@ -8,6 +8,8 @@ export type TabEvaluationInput = TabMatchContext & {
   tabId: number
   url: string
   title: string
+  /** epoch ms — best known last time tab was active */
+  lastAccessedMs: number
 }
 
 export type TabEvaluationOutcome = {
@@ -31,7 +33,7 @@ export function evaluateTab(
       matchedRules,
       winner: null,
       resolvedAction: null,
-      resolutionReason: 'single match',
+      resolutionReason: 'no matching rules',
       executed: false,
     }
   }

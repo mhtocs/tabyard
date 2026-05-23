@@ -1,8 +1,9 @@
+import { appendDevLogEntry } from '../logs/dev-log'
 import type {
   ActivityCache,
+  DevLogEntry,
   GraveyardEntry,
   LastRunSummary,
-  LifecycleLogEntry,
   Settings,
 } from './schema'
 import { STORAGE_KEYS } from './schema'
@@ -79,16 +80,34 @@ export async function writeActivityCache(cache: ActivityCache): Promise<void> {
   await storageSet({ [STORAGE_KEYS.activityCache]: cache })
 }
 
-export async function readLifecycleLog(): Promise<LifecycleLogEntry[]> {
-  const result = await storageGet<LifecycleLogEntry[]>(STORAGE_KEYS.lifecycleLog)
-  const log = result[STORAGE_KEYS.lifecycleLog]
-  return Array.isArray(log) ? log : []
+function isDevLogEntry(value: unknown): value is DevLogEntry {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+  const entry = value as DevLogEntry
+  return (
+    typeof entry.id === 'string' &&
+    typeof entry.at === 'number' &&
+    typeof entry.message === 'string'
+  )
 }
 
-export async function writeLifecycleLog(
-  entries: LifecycleLogEntry[],
-): Promise<void> {
-  await storageSet({ [STORAGE_KEYS.lifecycleLog]: entries })
+export async function readDevLog(): Promise<DevLogEntry[]> {
+  const result = await storageGet<unknown>(STORAGE_KEYS.devLog)
+  const log = result[STORAGE_KEYS.devLog]
+  if (!Array.isArray(log)) {
+    return []
+  }
+  return log.filter(isDevLogEntry)
+}
+
+export async function writeDevLog(entries: DevLogEntry[]): Promise<void> {
+  await storageSet({ [STORAGE_KEYS.devLog]: entries })
+}
+
+export async function appendDevLog(message: string, atMs = Date.now()): Promise<void> {
+  const log = await readDevLog()
+  await writeDevLog(appendDevLogEntry(log, message, atMs))
 }
 
 export async function readLastRun(): Promise<LastRunSummary | null> {

@@ -1,3 +1,4 @@
+import { MIN_GRAVEYARD_RETENTION_DAYS } from '../graveyard/store'
 import {
   type EvaluationIntervalMinutes,
   EVALUATION_INTERVALS,
@@ -53,11 +54,11 @@ export function parseSettings(raw: unknown): ParseSettingsResult {
   if (
     typeof graveyardRetentionDays !== 'number' ||
     !Number.isInteger(graveyardRetentionDays) ||
-    graveyardRetentionDays < 1
+    graveyardRetentionDays < MIN_GRAVEYARD_RETENTION_DAYS
   ) {
     return {
       ok: false,
-      error: 'graveyardRetentionDays must be a positive integer',
+      error: `graveyardRetentionDays must be at least ${MIN_GRAVEYARD_RETENTION_DAYS}`,
     }
   }
 
@@ -73,13 +74,5 @@ export function parseSettings(raw: unknown): ParseSettingsResult {
       graveyardRetentionDays,
       rules: rules.map((line) => line.trim()).filter((line) => line.length > 0),
     },
-  }
-}
-
-export function mergeSettings(partial: Partial<Settings>): Settings {
-  return {
-    ...DEFAULT_SETTINGS,
-    ...partial,
-    rules: partial.rules ?? DEFAULT_SETTINGS.rules,
   }
 }

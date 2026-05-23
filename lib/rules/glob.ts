@@ -26,7 +26,7 @@ export function globMatch(
   return re.test(value)
 }
 
-export function globToRegExp(pattern: string, flags = ''): RegExp {
+function globToRegExp(pattern: string, flags = ''): RegExp {
   let escaped = ''
   for (const char of pattern) {
     if (char === '*') {
