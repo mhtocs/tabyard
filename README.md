@@ -1,5 +1,5 @@
 # The Great Tab Keeper
-![chibi](docs/chibi/chibi.png)
+<img src="docs/chibi/chibi.png" width="500" height="500" alt="chibi">
 
 chrome extension: plain-text tab rules, scheduled cleanup, archive restore, dev logs.
 
