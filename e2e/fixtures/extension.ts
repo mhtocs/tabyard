@@ -115,7 +115,7 @@ export async function getEvaluationAlarmPeriodMinutes(
 ): Promise<number | undefined> {
   const serviceWorker = await getExtensionServiceWorker(context)
   return serviceWorker.evaluate(async () => {
-    const alarm = await chrome.alarms.get('tab-yard-evaluate')
+    const alarm = await chrome.alarms.get('tab-keeper-evaluate')
     return alarm?.periodInMinutes
   })
 }

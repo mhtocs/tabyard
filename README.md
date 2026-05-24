@@ -7,11 +7,11 @@ open the dashboard from the toolbar icon. rules run on an alarm; you can also hi
 
 ## how to use this extension
 
-not published to the chrome web store yet. install from a [github release](https://github.com/mhtocs/tabcleaner/releases) zip (when available) or build locally (see [setup](#setup)).
+not published to the chrome web store yet. install from a [github release](https://github.com/mhtocs/the-great-tab-keeper/releases) zip (when available) or build locally (see [setup](#setup)).
 
 ### install from a release
 
-1. open [releases](https://github.com/mhtocs/tabcleaner/releases) and download `the-great-tab-keeper-v<version>.zip` for the version you want.
+1. open [releases](https://github.com/mhtocs/the-great-tab-keeper/releases) and download `the-great-tab-keeper-v<version>.zip` for the version you want.
 2. unzip it anywhere (e.g. downloads). you get one folder; that's the extension.
 3. in chrome, open **extensions**, turn on **developer mode**, click **load unpacked**, and select that unzipped folder (the folder itself, not the zip file).
 4. pin or open **The Great Tab Keeper** from the toolbar to open the dashboard. set rules, save, and leave the engine on for scheduled cleanup (or use **run now**).
@@ -90,7 +90,7 @@ you do not need this to build the extension or load `dist/` in chrome.
 
 ### releases
 
-[published releases](https://github.com/mhtocs/tabcleaner/releases) include a zip of `dist/` for load unpacked in chrome.
+[published releases](https://github.com/mhtocs/the-great-tab-keeper/releases) include a zip of `dist/` for load unpacked in chrome.
 
 tag must match `package.json` version (e.g. tag `v0.0.1` and `"version": "0.0.1"`):
 

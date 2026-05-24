@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   EVALUATION_ALARM_NAME,
+  LEGACY_EVALUATION_ALARM_NAME,
   syncEvaluationAlarm,
   syncEvaluationAlarmIfNeeded,
 } from './scheduler'
@@ -20,6 +21,7 @@ describe('syncEvaluationAlarm', () => {
 
     await syncEvaluationAlarm(p, 15)
 
+    expect(p.clearAlarm).toHaveBeenCalledWith(LEGACY_EVALUATION_ALARM_NAME)
     expect(p.clearAlarm).toHaveBeenCalledWith(EVALUATION_ALARM_NAME)
     expect(p.createAlarm).toHaveBeenCalledWith(EVALUATION_ALARM_NAME, 15)
   })

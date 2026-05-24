@@ -10,7 +10,7 @@ import {
   writeSettings,
 } from '../lib/storage/chrome-storage'
 import { queryAllTabs } from './chrome-tabs'
-import { runTabYardEvaluationCycle } from './evaluation-runner'
+import { runKeeperEvaluationCycle } from './evaluation-runner'
 import { schedulerPorts } from './scheduler-ports'
 
 let readyPromise: Promise<void> | null = null
@@ -63,7 +63,7 @@ async function runOverdueEvaluationIfNeeded(): Promise<void> {
   if (Date.now() < dueAt) {
     return
   }
-  await runTabYardEvaluationCycle()
+  await runKeeperEvaluationCycle()
 }
 
 export async function initializeExtension(options?: {
@@ -74,6 +74,6 @@ export async function initializeExtension(options?: {
     await runOverdueEvaluationIfNeeded()
   }
   if (options?.runCycle) {
-    await runTabYardEvaluationCycle()
+    await runKeeperEvaluationCycle()
   }
 }

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "The Great Tab Keeper",
   "short_name": "Tab Keeper",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "archive idle tabs from plain-text rules, restore from archive",
   "permissions": ["tabs", "storage", "alarms"],
   "background": {

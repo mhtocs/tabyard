@@ -18,7 +18,7 @@ import { whenExtensionReady } from './setup'
 
 let cycleTail: Promise<EvaluationCycleResult | void> = Promise.resolve()
 
-export function runTabYardEvaluationCycle(): Promise<EvaluationCycleResult> {
+export function runKeeperEvaluationCycle(): Promise<EvaluationCycleResult> {
   const run = async (): Promise<EvaluationCycleResult> => {
     await whenExtensionReady()
     const result = await runEvaluationCycle({

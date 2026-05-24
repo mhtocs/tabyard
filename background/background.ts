@@ -1,5 +1,5 @@
 import { EXTENSION_LOG_PREFIX } from '../lib/product-name'
-import { runTabYardEvaluationCycle } from './evaluation-runner'
+import { runKeeperEvaluationCycle } from './evaluation-runner'
 import { restoreFromArchive } from './archive-restore'
 import { registerRuntimeMessageListener } from './messages'
 import { registerSchedulerListeners, rescheduleEvaluationAlarm } from './scheduler'
@@ -43,9 +43,9 @@ function registerActivityListeners(): void {
 
 registerOpenDashboardOnActionClick()
 registerActivityListeners()
-registerSchedulerListeners(runTabYardEvaluationCycle)
+registerSchedulerListeners(runKeeperEvaluationCycle)
 registerRuntimeMessageListener({
-  runCycle: runTabYardEvaluationCycle,
+  runCycle: runKeeperEvaluationCycle,
   restoreArchive: restoreFromArchive,
   restoreSuspendedTab,
   rescheduleAlarm: rescheduleEvaluationAlarm,
