@@ -1,4 +1,5 @@
 # The Great Tab Keeper
+![chibi](docs/chibi/chibi.png)
 
 chrome extension: plain-text tab rules, scheduled cleanup, archive restore, dev logs.
 
