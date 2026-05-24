@@ -42,12 +42,21 @@ evaluation interval and graveyard retention. saves immediately; interval change 
 
 ```bash
 npm install
-npm run build
+npm run build          # → ./dist/
 ```
+
+```bash
+npm test
+npm run test:ui
+npm run lint
+npm run verify         # build + unit + ui + lint + e2e (e2e needs headed playwright)
+```
+
+iterative builds: `npm run watch` rebuilds `dist/` on change; reload the extension after each build.
 
 load unpacked from `dist/` in chrome: extensions → developer mode → load unpacked → choose the `dist/` folder.
 
-iterative builds: `npm run watch` rebuilds `dist/` on change; reload the extension after each build.
+ci on push/pr runs `npm ci`, build, unit, ui, and lint (see `.github/workflows/ci.yml`). e2e is local only — headed playwright + mv3.
 
 ### playwright (e2e / screenshots only)
 
@@ -61,6 +70,19 @@ npx playwright install chromium
 
 you do not need this to build the extension or load `dist/` in chrome.
 
+### releases
+
+[published releases](https://github.com/mhtocs/tabcleaner/releases) include a zip of `dist/` for load unpacked in chrome.
+
+tag must match `package.json` version (`v0.0.1` → `"version": "0.0.1"`):
+
+```bash
+git tag v0.0.1
+git push origin v0.0.1
+```
+
+github actions builds, tests, and attaches `tabcleaner-v0.0.1.zip`.
+
 ## commands
 
 | command | purpose |
@@ -71,6 +93,7 @@ you do not need this to build the extension or load `dist/` in chrome.
 | `npm run test:e2e` | playwright + loaded extension (headed) |
 | `npm run verify` | build + unit + ui + lint + e2e |
 | `npm run screenshots:readme` | refresh `docs/screenshots/` for this file |
+| `./scripts/package-extension.sh` | zip `dist/` → `tabcleaner-v<version>.zip` |
 
 ## license
 

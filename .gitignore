@@ -9,6 +9,7 @@ node_modules
 # build
 dist
 dist-ssr
+tabcleaner-v*.zip
 *.tsbuildinfo
 
 # env (secrets)

@@ -1,0 +1,50 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: tag matches package.json version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(jq -r .version package.json)"
+          if [ "$tag" != "$pkg" ]; then
+            echo "tag v$tag does not match package.json version $pkg" >&2
+            exit 1
+          fi
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - run: npm test
+
+      - run: npm run test:ui
+
+      - run: npm run lint
+
+      - name: package dist zip
+        run: |
+          chmod +x scripts/package-extension.sh
+          ./scripts/package-extension.sh "${GITHUB_REF_NAME#v}"
+
+      - name: create github release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: tabcleaner-v*.zip
+          generate_release_notes: true
