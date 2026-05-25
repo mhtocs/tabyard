@@ -2,6 +2,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import type { Page } from '@playwright/test'
 import { initialSettings } from '../lib/defaults/seed'
 import type { DevLogEntry, ArchiveEntry } from '../lib/storage/schema'
 import {
@@ -18,6 +19,13 @@ const outDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../docs/screenshots',
 )
+
+async function captureScreenshot(page: Page, filename: string) {
+  await page.screenshot({
+    path: path.join(outDir, filename),
+    fullPage: true,
+  })
+}
 
 // keep / archive / discard / suspend + url / inactive, copied from lib + e2e tests
 const readmeRules = [
@@ -113,20 +121,20 @@ test('capture readme screenshots', async ({ context, dashboardUrl, extensionId }
     await expect(textarea).toHaveValue(new RegExp(line.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
   await page.locator('header ul').waitFor()
-  await page.screenshot({ path: path.join(outDir, 'rules.png') })
+  await captureScreenshot(page, 'rules.png')
 
   await clickDashboardTab(page, 'archive')
   await page.getByRole('button', { name: 'Pull requests' }).waitFor()
-  await page.screenshot({ path: path.join(outDir, 'archive.png') })
+  await captureScreenshot(page, 'archive.png')
 
   await clickDashboardTab(page, 'logs')
   await page.locator('pre').waitFor()
   await expect(page.locator('pre')).toContainText('cycle finished')
-  await page.screenshot({ path: path.join(outDir, 'logs.png') })
+  await captureScreenshot(page, 'logs.png')
 
   await clickDashboardTab(page, 'settings')
   await page.locator('select').waitFor()
-  await page.screenshot({ path: path.join(outDir, 'settings.png') })
+  await captureScreenshot(page, 'settings.png')
 
   await page.close()
 
@@ -137,6 +145,6 @@ test('capture readme screenshots', async ({ context, dashboardUrl, extensionId }
   await suspendedPage.getByText('suspended by the great tab keeper').waitFor()
   await expect(suspendedPage.getByText('The Episode Archive')).toBeVisible()
   await expect(suspendedPage.getByText('https://journalclub.io/episodes')).toBeVisible()
-  await suspendedPage.screenshot({ path: path.join(outDir, 'suspend.png') })
+  await captureScreenshot(suspendedPage, 'suspend.png')
   await suspendedPage.close()
 })

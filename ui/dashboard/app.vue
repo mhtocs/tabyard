@@ -19,9 +19,9 @@ const { statLines, loading: statsLoading } = useCycleStats()
       <header class="mb-6 flex items-start justify-between gap-6">
         <div>
           <h1 class="text-xl font-semibold text-gray-800">{{ extensionName }}</h1>
-          <p class="mt-1 max-w-md text-sm text-gray-500">
-            plain-text rules to archive, discard, suspend, or keep tabs on a schedule, with an
-            archive to restore what you removed.
+          <p class="mt-1 max-w-lg text-sm text-gray-500">
+            Reduce tab clutter with rules you control. keep, archive, suspend, or discard tabs on a
+            schedule.
           </p>
         </div>
         <ul

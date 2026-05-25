@@ -28,7 +28,7 @@ function onRetentionBlur(event: Event) {
 
 <template>
   <section class="space-y-6 p-6">
-    <div v-if="loading" class="text-sm text-gray-500">loading…</div>
+    <div v-if="loading" class="text-sm text-gray-500">loading...</div>
 
     <template v-else-if="settings">
       <p class="text-sm text-gray-600">schedule and archive retention. changes save immediately.</p>

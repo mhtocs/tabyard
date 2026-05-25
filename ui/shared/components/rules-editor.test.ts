@@ -36,6 +36,15 @@ describe('rules-editor', () => {
     vi.unstubAllGlobals()
   })
 
+  it('shows rule format reference', async () => {
+    const wrapper = mount(RulesEditor)
+    await vi.waitFor(() => expect(wrapper.text()).not.toContain('loading'))
+
+    expect(wrapper.text()).toContain('rule format & examples')
+    expect(wrapper.text()).toContain('archive inactive>2h')
+    expect(wrapper.text()).toContain('suspend inactive>2h url=journalclub.io')
+  })
+
   it('shows validation error for invalid rule on save', async () => {
     const wrapper = mount(RulesEditor)
     await vi.waitFor(() => expect(wrapper.text()).not.toContain('loading'))

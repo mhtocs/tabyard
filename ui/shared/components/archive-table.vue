@@ -41,7 +41,7 @@ function onFaviconError(entryId: string) {
 
 <template>
   <section class="flex h-full min-h-[28rem] flex-col px-6 pb-6 pt-4">
-    <div v-if="loading" class="text-xs text-gray-500">loading…</div>
+    <div v-if="loading" class="text-xs text-gray-500">loading...</div>
 
     <template v-else>
       <p class="mb-4 text-xs text-gray-500">{{ hintLine }}</p>
